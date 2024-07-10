@@ -1,3 +1,5 @@
+//go:build microbit_v2
+
 package imu
 
 import (
@@ -7,20 +9,19 @@ import (
 	"tinygo.org/x/drivers/lsm303agr"
 )
 
-var (
-	wire = machine.I2C0
-	imu  = lsm303agr.New(wire)
-)
-
 type IMU struct {
 	*lsm303agr.Device
-	bus *machine.I2C
+	bus        *machine.I2C
+	dx, dy, dz float32
 }
 
 func New(bus *machine.I2C) (*IMU, error) {
 	imu := &IMU{
 		Device: lsm303agr.New(bus),
 		bus:    bus,
+		dx:     1.0,
+		dy:     1.0,
+		dz:     1.0,
 	}
 	if err := imu.Configure(lsm303agr.Configuration{
 		AccelDataRate:  lsm303agr.ACCEL_DATARATE_10HZ,
@@ -69,40 +70,4 @@ func New(bus *machine.I2C) (*IMU, error) {
 	imu.ReadAccel(0x31)
 	imu.ReadMag(0x64)
 	return imu, nil
-}
-
-func (imu *IMU) GetAccel() (float32, float32, float32, error) {
-	x, y, z, err := imu.ReadAcceleration()
-	if err != nil {
-		return 0, 0, 0, fmt.Errorf("IMU: %w", err)
-	}
-	return float32(x) / 1000000, float32(y) / 1000000, float32(z) / 1000000, nil
-}
-
-func (imu *IMU) ReadAccel(reg uint8) byte {
-	b := []byte{0}
-	if err := imu.bus.ReadRegister(imu.AccelAddress, reg, b); err != nil {
-		panic(err)
-	}
-	return b[0]
-}
-
-func (imu *IMU) WriteAccel(reg, data uint8) {
-	if err := imu.bus.WriteRegister(imu.AccelAddress, reg, []byte{data}); err != nil {
-		panic(err)
-	}
-}
-
-func (imu *IMU) ReadMag(reg uint8) byte {
-	b := []byte{0}
-	if err := imu.bus.ReadRegister(imu.MagAddress, reg, b); err != nil {
-		panic(err)
-	}
-	return b[0]
-}
-
-func (imu *IMU) WriteMag(reg, data uint8) {
-	if err := imu.bus.WriteRegister(imu.MagAddress, reg, []byte{data}); err != nil {
-		panic(err)
-	}
 }

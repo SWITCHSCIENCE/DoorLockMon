@@ -3,8 +3,6 @@ module DoorLockMon
 go 1.22.4
 
 require (
-	github.com/caarlos0/env/v11 v11.1.0
-	github.com/joho/godotenv v1.5.1
 	tinygo.org/x/bluetooth v0.10.0
 	tinygo.org/x/drivers v0.28.0
 )

@@ -1,0 +1,6 @@
+{
+  "inherits": ["nrf52840", "nrf52840-s140v6-uf2"],
+  "build-tags": ["nrf52840_generic"],
+  "serial-port": ["239a:0029", "1209:9090"],
+  "msd-volume-name": ["NRF52BOOT"]
+}

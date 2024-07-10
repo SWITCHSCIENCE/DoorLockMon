@@ -5,18 +5,16 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
 	"time"
 
-	"github.com/caarlos0/env/v11"
-	"github.com/joho/godotenv"
 	"tinygo.org/x/bluetooth"
 
 	"DoorLockMon/messages"
+	"DoorLockMon/realm"
 )
 
 var (
@@ -25,12 +23,6 @@ var (
 	requestUUID, _ = bluetooth.ParseUUID("a0b40002-926d-4d61-98df-8c5c62ee53b4")
 	reportUUID, _  = bluetooth.ParseUUID("a0b40002-926d-4d61-98df-8c5c62ee53b5")
 )
-
-var config = struct {
-	ClientID     string `env:"ClientID,required"`
-	ClientSecret string `env:"ClientSecret,required"`
-	Realm        string `env:"Realm,required"`
-}{}
 
 type Notify struct {
 	Title string `json:"title,omitempty"`
@@ -64,7 +56,7 @@ func ScanAndConnect(ctx context.Context) error {
 		log.Println("scan start")
 		defer log.Println("scan stop")
 		if err := adapter.Scan(func(adapter *bluetooth.Adapter, device bluetooth.ScanResult) {
-			if device.LocalName() == "Door-Lock2" {
+			if device.LocalName() == "Door-Lock" {
 				adapter.StopScan()
 				result <- device
 			}
@@ -137,7 +129,7 @@ func ScanAndConnect(ctx context.Context) error {
 			case <-tick.C:
 				println("write request")
 				h := md5.New()
-				h.Write([]byte(config.Realm))
+				h.Write([]byte(realm.Value))
 				h.Write(lastRandom)
 				b := h.Sum(nil)
 				if _, err := request.WriteWithoutResponse(b); err != nil {
@@ -150,15 +142,6 @@ func ScanAndConnect(ctx context.Context) error {
 
 func init() {
 	log.SetFlags(log.Lshortfile)
-	var dotenv string
-	flag.StringVar(&dotenv, "env", ".env", "load .env file")
-	flag.Parse()
-	if err := godotenv.Load(dotenv); err != nil {
-		log.Print(err)
-	}
-	if err := env.Parse(&config); err != nil {
-		log.Fatal(err)
-	}
 }
 
 func main() {

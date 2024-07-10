@@ -11,9 +11,8 @@ import (
 
 	"DoorLockMon/firmware/core"
 	"DoorLockMon/messages"
+	"DoorLockMon/realm"
 )
-
-const realm = "ndhg73ghde7238"
 
 var (
 	adapter        = bluetooth.DefaultAdapter
@@ -30,7 +29,7 @@ func init() {
 		core.Failed(fmt.Errorf("adapter.Enable: %w", err))
 	}
 	hash := md5.New()
-	hash.Write([]byte(realm))
+	hash.Write([]byte(realm.Value))
 	hash.Write(random)
 	copy(verify, hash.Sum(nil))
 }
