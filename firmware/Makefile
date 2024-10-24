@@ -1,4 +1,4 @@
-ifeq ($(ORIG),"")
+ifeq ($(ORIG),)
 TARGET=microbit-v2-s113v7
 PROG=-programmer cmsis-dap
 else
@@ -6,13 +6,10 @@ TARGET=./config.json
 PROG=
 endif
 ifeq ($(OS),Windows_NT)
-PORT=COM22
+PORT=COM6
 else
 PORT=/dev/tty.usbmodem14102
 endif
-
-test:
-	echo $(SD)
 
 build:
 	tinygo build -target $(TARGET) -o main.hex .

@@ -38,7 +38,7 @@ func setMotor(d float32) {
 	machine.PWM0.Set(motor, uint32(float32(machine.PWM0.PWM.GetCOUNTERTOP())*d))
 }
 
-func init() {
+func Setup() {
 	IMU_DRDY.Configure(machine.PinConfig{Mode: machine.PinInput})
 	IMU_INT.Configure(machine.PinConfig{Mode: machine.PinInput})
 	IMU_INT1.Configure(machine.PinConfig{Mode: machine.PinInputPullup})

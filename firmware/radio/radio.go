@@ -86,10 +86,11 @@ func (r *Radio) Run() bool {
 	if err := r.adv.Start(); err != nil {
 		core.Failed(fmt.Errorf("adv.Start: %w", err))
 	}
+	totalTimeout := time.NewTimer(120 * time.Second)
 	timeout := time.NewTimer(30 * time.Second)
 	connect := make(chan bool)
 	adapter.SetConnectHandler(func(dev bluetooth.Device, connected bool) {
-		println("connected")
+		println("connected:", connected)
 		connect <- connected
 	})
 	for {
@@ -104,6 +105,8 @@ func (r *Radio) Run() bool {
 		case b := <-r.event:
 			timeout.Reset(25 * time.Second)
 			return bytes.Equal(b, verify)
+		case <-totalTimeout.C:
+			return false
 		case <-timeout.C:
 			return false
 		}

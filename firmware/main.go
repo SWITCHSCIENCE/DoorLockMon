@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	core.Setup()
 	println("wakeup")
 	defer core.PowerOFF()
 	ble := radio.New("Door-Lock")

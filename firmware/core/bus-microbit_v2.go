@@ -30,7 +30,7 @@ var (
 	sensor  *imu.IMU
 )
 
-func init() {
+func Setup() {
 	if err := IMU_BUS.Configure(machine.I2CConfig{}); err != nil {
 		Failed(err)
 	}
